@@ -1,0 +1,28 @@
+body {
+  text-align: center;
+  font-family: sans-serif;
+  background: #fefefe;
+  margin-top: 40px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+canvas {
+  border: 2px solid #444;
+  background: #fff;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+}
+
+p {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+#gameOver {
+  font-size: 20px;
+  color: crimson;
+  font-weight: bold;
+}

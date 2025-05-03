@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>さめがめ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>さめがめ</h1>
+  <canvas id="gameCanvas" width="320" height="480"></canvas>
+  <p>スコア: <span id="score">0</span></p>
+  <p id="gameOver" style="display:none;"></p>
+
+  <!-- ✨ フォームここから ✨ -->
+  <div id="scoreForm" style="display: none; margin-top: 20px;">
+    <h2>スコアを登録しよう！</h2>
+    <form id="submitForm">
+      <label>名前: <input type="text" id="nameInput" required></label><br><br>
+
+      <div id="drawArea">
+        <h3>絵を描こう！</h3>
+        <canvas id="drawCanvas" width="200" height="200" style="border:1px solid black;"></canvas><br>
+        色を選ぶ: 
+        <button type="button" onclick="changeColor('black')">黒</button>
+        <button type="button" onclick="changeColor('red')">赤</button>
+        <button type="button" onclick="changeColor('blue')">青</button>
+        <button type="button" onclick="clearCanvas()">消す</button>
+      </div><br>
+
+      <input type="hidden" id="scoreInput">
+      <button type="submit">送信！</button>
+    </form>
+  </div>
+  <!-- ✨ フォームここまで ✨ -->
+
+  <script src="script.js"></script>
+</body>
+</html>
