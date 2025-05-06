@@ -226,11 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreVal = document.getElementById('scoreInput').value;
     const canvasData = document.getElementById('drawCanvas').toDataURL();
 
-  fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec', {
+fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec', {
   method: 'POST',
   body: JSON.stringify({ name, score: scoreVal, image: canvasData }),
 })
-    .then(response => response.text())
+.then(response => response.text())
 .then(data => {
   alert('登録完了！');
 
@@ -242,13 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ランキング読み込み
   fetchRanking();
-});
-
-    .catch((error) => {
-      console.error('Error:', error);
-      alert('登録失敗...');
-    });
-  });
+})
+.catch((error) => {
+  console.error('Error:', error);
+  alert('登録失敗...');
 });
 
 function fetchRanking() {
