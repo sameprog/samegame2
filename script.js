@@ -231,10 +231,19 @@ document.addEventListener('DOMContentLoaded', () => {
   body: JSON.stringify({ name, score: scoreVal, image: canvasData }),
 })
     .then(response => response.text())
-    .then(data => {
-      alert('登録完了！');
-      location.reload();
-    })
+.then(data => {
+  alert('登録完了！');
+
+  // フォーム非表示
+  document.getElementById('scoreForm').style.display = 'none';
+
+  // ランキング表示
+  document.getElementById('rankingSection').style.display = 'block';
+
+  // ランキング読み込み
+  fetchRanking();
+});
+
     .catch((error) => {
       console.error('Error:', error);
       alert('登録失敗...');
@@ -242,4 +251,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+function fetchRanking() {
+  fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec')
+    .then(response => response.json())
+    .then(data => {
+      const rankingList = document.getElementById('rankingList');
+      rankingList.innerHTML = ''; // いったん中身クリア
+
+      data.forEach(entry => {
+        const item = document.createElement('div');
+        item.innerHTML = `
+          <p>🎮 ${entry.name} - ${entry.score} 点</p>
+          <img src="${entry.image}" alt="絵" width="100">
+        `;
+        rankingList.appendChild(item);
+      });
+    })
+    .catch(error => {
+      console.error('ランキング取得エラー:', error);
+      document.getElementById('rankingList').textContent = '読み込み失敗...';
+    });
+}
 
