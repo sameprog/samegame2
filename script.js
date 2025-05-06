@@ -29,7 +29,6 @@ function initBoard() {
 
 function drawBoard() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   board.forEach((row, y) => {
     row.forEach((imgIndex, x) => {
       if (imgIndex !== null) {
@@ -43,7 +42,6 @@ function drawBoard() {
       }
     });
   });
-
   document.getElementById("score").textContent = score;
 }
 
@@ -136,14 +134,14 @@ window.onload = () => {
   }))).then(() => {
     console.log("All images loaded!");
     initBoard();
-    setupDrawing(); // ⭐ 絵描き機能のセットアップもここでやる
+    setupDrawing();
   });
 };
 
 // =================== 絵描き機能 ===================
 function setupDrawing() {
   const drawCanvas = document.getElementById('drawCanvas');
-  if (!drawCanvas) return;  // フォームがまだ出てないときはスキップ
+  if (!drawCanvas) return;
   const drawCtx = drawCanvas.getContext('2d');
   let drawing = false;
   let currentColor = 'black';
@@ -226,35 +224,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreVal = document.getElementById('scoreInput').value;
     const canvasData = document.getElementById('drawCanvas').toDataURL();
 
-fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec', {
-  method: 'POST',
-  body: JSON.stringify({ name, score: scoreVal, image: canvasData }),
-})
-.then(response => response.text())
-.then(data => {
-  alert('登録完了！');
-
-  // フォーム非表示
-  document.getElementById('scoreForm').style.display = 'none';
-
-  // ランキング表示
-  document.getElementById('rankingSection').style.display = 'block';
-
-  // ランキング読み込み
-  fetchRanking();
-})
-.catch((error) => {
-  console.error('Error:', error);
-  alert('登録失敗...');
+    fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec', {
+      method: 'POST',
+      body: JSON.stringify({ name, score: scoreVal, image: canvasData }),
+    })
+    .then(response => response.text())
+    .then(data => {
+      alert('登録完了！');
+      document.getElementById('scoreForm').style.display = 'none';
+      document.getElementById('rankingSection').style.display = 'block';
+      fetchRanking();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      alert('登録失敗...');
+    });
+  });
 });
 
+// =================== ランキング読み込み ===================
 function fetchRanking() {
   fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec')
     .then(response => response.json())
     .then(data => {
       const rankingList = document.getElementById('rankingList');
-      rankingList.innerHTML = ''; // いったん中身クリア
-
+      rankingList.innerHTML = '';
       data.forEach(entry => {
         const item = document.createElement('div');
         item.innerHTML = `
@@ -269,4 +263,3 @@ function fetchRanking() {
       document.getElementById('rankingList').textContent = '読み込み失敗...';
     });
 }
-
