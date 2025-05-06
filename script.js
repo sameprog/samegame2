@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreVal = document.getElementById('scoreInput').value;
     const canvasData = document.getElementById('drawCanvas').toDataURL();
 
-  fetch('https://script.google.com/macros/s/AKfycbzMa9Py81G59mX3K6Mz1xjYwn0AxnhZh7ShBwa4Fj8FJs8a6QkqiMJqiAFfqtnL-6b6tw/exec', {
+  fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec', {
   method: 'POST',
   body: JSON.stringify({ name, score: scoreVal, image: canvasData }),
 })
@@ -241,3 +241,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+
