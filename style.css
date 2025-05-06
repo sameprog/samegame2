@@ -26,3 +26,18 @@ p {
   color: crimson;
   font-weight: bold;
 }
+
+#rankingList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;  /* 間隔 */
+  justify-content: flex-start;
+}
+
+.ranking-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: calc(20% - 20px);  /* 5個並べる */
+  box-sizing: border-box;
+  text-align: center;
+}
