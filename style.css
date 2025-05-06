@@ -35,10 +35,9 @@ p {
 }
 
 .ranking-item {
+  width: 150px;
   border: 1px solid #ccc;
   padding: 10px;
-  width: calc(20% - 20px);  /* 5個並べる */
-  box-sizing: border-box;
   text-align: center;
 }
 
