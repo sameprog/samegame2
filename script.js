@@ -248,11 +248,18 @@ function fetchRanking() {
     .then(response => response.json())
     .then(data => {
       const rankingList = document.getElementById('rankingList');
-      rankingList.innerHTML = '';
-      data.forEach(entry => {
+      rankingList.innerHTML = ''; // 一旦クリア
+
+      data.sort((a, b) => b.score - a.score);  // 高得点順にソート
+
+      data.forEach((entry, index) => {
         const item = document.createElement('div');
+        item.className = 'ranking-item';  // ⭐ CSSで使う
+
         item.innerHTML = `
-          <p>🎮 ${entry.name} - ${entry.score} 点</p>
+          <p>🥇 ${index + 1} 位</p>
+          <p>👤 ${entry.name} - ${entry.score} 点</p>
+          <p>📅 ${entry.date}</p>
           <img src="${entry.image}" alt="絵" width="100">
         `;
         rankingList.appendChild(item);
