@@ -270,3 +270,10 @@ function fetchRanking() {
       document.getElementById('rankingList').textContent = '読み込み失敗...';
     });
 }
+
+document.getElementById('showRankingBtn').addEventListener('click', () => {
+  document.getElementById('rankingSection').style.display = 'block';
+  document.getElementById('scoreForm').style.display = 'none';
+  document.getElementById('gameOver').style.display = 'none';
+  fetchRanking();
+});
