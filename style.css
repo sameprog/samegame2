@@ -41,3 +41,9 @@ p {
   box-sizing: border-box;
   text-align: center;
 }
+
+#showRankingBtn {
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
