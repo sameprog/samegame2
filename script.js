@@ -1,130 +1,274 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+document.addEventListener('DOMContentLoaded', () => {
 
-const cols = 10;
-const rows = 15;
-const blockSize = 32;
-const imageCount = 4;
-const images = [];
+  // ===== ゲーム盤のセットアップ =====
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
 
-let board = [];
-let score = 0;
+  const cols = 10;
+  const rows = 15;
+  const blockSize = 32;
+  const imageCount = 4;
+  const images = [];
 
-// 画像読み込み
-for (let i = 0; i < imageCount; i++) {
-  const img = new Image();
-  img.src = `img${i}.png`; // 例: img0.png〜img3.png
-  images.push(img);
-}
+  let board = [];
+  let score = 0;
 
-function initBoard() {
-  board = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.floor(Math.random() * imageCount))
-  );
-  score = 0;
-  document.getElementById("gameOver").style.display = "none";
-  drawBoard();
-  checkGameOver();
-}
+  // 画像読み込み
+  for (let i = 0; i < imageCount; i++) {
+    const img = new Image();
+    img.src = `img${i}.png`;
+    images.push(img);
+  }
 
-function drawBoard() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  board.forEach((row, y) => {
-    row.forEach((imgIndex, x) => {
-      if (imgIndex !== null) {
-        ctx.drawImage(
-          images[imgIndex],
-          x * blockSize,
-          y * blockSize,
-          blockSize,
-          blockSize
-        );
-      }
+  function initBoard() {
+    board = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => Math.floor(Math.random() * imageCount))
+    );
+    score = 0;
+    document.getElementById("gameOver").style.display = "none";
+    drawBoard();
+    checkGameOver();
+  }
+
+  function drawBoard() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    board.forEach((row, y) => {
+      row.forEach((imgIndex, x) => {
+        if (imgIndex !== null) {
+          ctx.drawImage(
+            images[imgIndex],
+            x * blockSize,
+            y * blockSize,
+            blockSize,
+            blockSize
+          );
+        }
+      });
     });
-  });
-  document.getElementById("score").textContent = score;
-}
-
-function getConnected(x, y, target, visited = {}) {
-  if (
-    x < 0 || x >= cols || y < 0 || y >= rows ||
-    board[y][x] !== target || visited[`${x},${y}`]
-  ) return [];
-
-  visited[`${x},${y}`] = true;
-  return [
-    [x, y],
-    ...getConnected(x + 1, y, target, visited),
-    ...getConnected(x - 1, y, target, visited),
-    ...getConnected(x, y + 1, target, visited),
-    ...getConnected(x, y - 1, target, visited)
-  ];
-}
-
-function removeAndCollapse(connected) {
-  connected.forEach(([x, y]) => {
-    board[y][x] = null;
-  });
-
-  for (let x = 0; x < cols; x++) {
-    let col = [];
-    for (let y = 0; y < rows; y++) {
-      if (board[y][x] !== null) col.push(board[y][x]);
-    }
-    for (let y = rows - 1; y >= 0; y--) {
-      board[y][x] = col.length ? col.pop() : null;
-    }
+    document.getElementById("score").textContent = score;
   }
 
-  drawBoard();
-  checkGameOver();
-}
+  function getConnected(x, y, target, visited = {}) {
+    if (
+      x < 0 || x >= cols || y < 0 || y >= rows ||
+      board[y][x] !== target || visited[`${x},${y}`]
+    ) return [];
 
-function hasMoves() {
-  for (let y = 0; y < rows; y++) {
+    visited[`${x},${y}`] = true;
+    return [
+      [x, y],
+      ...getConnected(x + 1, y, target, visited),
+      ...getConnected(x - 1, y, target, visited),
+      ...getConnected(x, y + 1, target, visited),
+      ...getConnected(x, y - 1, target, visited)
+    ];
+  }
+
+  function removeAndCollapse(connected) {
+    connected.forEach(([x, y]) => {
+      board[y][x] = null;
+    });
+
     for (let x = 0; x < cols; x++) {
-      const val = board[y][x];
-      if (val === null) continue;
-      const connected = getConnected(x, y, val);
-      if (connected.length >= 2) return true;
+      let col = [];
+      for (let y = 0; y < rows; y++) {
+        if (board[y][x] !== null) col.push(board[y][x]);
+      }
+      for (let y = rows - 1; y >= 0; y--) {
+        board[y][x] = col.length ? col.pop() : null;
+      }
+    }
+
+    drawBoard();
+    checkGameOver();
+  }
+
+  function hasMoves() {
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const val = board[y][x];
+        if (val === null) continue;
+        const connected = getConnected(x, y, val);
+        if (connected.length >= 2) return true;
+      }
+    }
+    return false;
+  }
+
+  function checkGameOver() {
+    if (!hasMoves()) {
+      const message = `🎉 ゲーム終了！あなたのスコアは ${score} 点です 🎉`;
+      const gameOverEl = document.getElementById("gameOver");
+      gameOverEl.textContent = message;
+      gameOverEl.style.display = "block";
+
+      const scoreForm = document.getElementById("scoreForm");
+      if (scoreForm) {
+        scoreForm.style.display = "block";
+        document.getElementById("scoreInput").value = score;
+      }
     }
   }
-  return false;
-}
 
-function checkGameOver() {
-  if (!hasMoves()) {
-    const message = `🎉 ゲーム終了！あなたのスコアは ${score} 点です 🎉`;
-    const gameOverEl = document.getElementById("gameOver");
-    gameOverEl.textContent = message;
-    gameOverEl.style.display = "block";
+  canvas.addEventListener("click", (e) => {
+    const x = Math.floor(e.offsetX / blockSize);
+    const y = Math.floor(e.offsetY / blockSize);
+    const imgIndex = board[y][x];
+    if (imgIndex === null) return;
 
-    // フォームを表示してスコアを渡す
-    const scoreForm = document.getElementById("scoreForm");
-    if (scoreForm) {
-      scoreForm.style.display = "block";
-      document.getElementById("scoreInput").value = score;
+    const connected = getConnected(x, y, imgIndex);
+    if (connected.length >= 2) {
+      score += connected.length * connected.length;
+      removeAndCollapse(connected);
     }
+  });
+
+  // ====== 絵描き機能 ======
+  function setupDrawing() {
+    const drawCanvas = document.getElementById('drawCanvas');
+    if (!drawCanvas) return;
+    const drawCtx = drawCanvas.getContext('2d');
+    let drawing = false;
+    let currentColor = 'black';
+
+    window.changeColor = function(color) {
+      currentColor = color;
+    };
+
+    window.clearCanvas = function() {
+      drawCtx.clearRect(0, 0, drawCtx.canvas.width, drawCtx.canvas.height);
+    };
+
+    function getPointerPosition(e) {
+      let rect = drawCanvas.getBoundingClientRect();
+      if (e.touches) {
+        return {
+          x: e.touches[0].clientX - rect.left,
+          y: e.touches[0].clientY - rect.top
+        };
+      } else {
+        return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        };
+      }
+    }
+
+    drawCanvas.addEventListener('mousedown', (e) => {
+      drawing = true;
+      drawCtx.beginPath();
+      let pos = getPointerPosition(e);
+      drawCtx.moveTo(pos.x, pos.y);
+    });
+
+    drawCanvas.addEventListener('mouseup', () => {
+      drawing = false;
+    });
+
+    drawCanvas.addEventListener('mousemove', (e) => {
+      if (!drawing) return;
+      let pos = getPointerPosition(e);
+      drawCtx.lineWidth = 2;
+      drawCtx.lineCap = 'round';
+      drawCtx.strokeStyle = currentColor;
+      drawCtx.lineTo(pos.x, pos.y);
+      drawCtx.stroke();
+    });
+
+    drawCanvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      drawing = true;
+      drawCtx.beginPath();
+      let pos = getPointerPosition(e);
+      drawCtx.moveTo(pos.x, pos.y);
+    });
+
+    drawCanvas.addEventListener('touchend', () => {
+      drawing = false;
+    });
+
+    drawCanvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (!drawing) return;
+      let pos = getPointerPosition(e);
+      drawCtx.lineWidth = 2;
+      drawCtx.lineCap = 'round';
+      drawCtx.strokeStyle = currentColor;
+      drawCtx.lineTo(pos.x, pos.y);
+      drawCtx.stroke();
+    });
   }
-}
 
-canvas.addEventListener("click", (e) => {
-  const x = Math.floor(e.offsetX / blockSize);
-  const y = Math.floor(e.offsetY / blockSize);
-  const imgIndex = board[y][x];
-  if (imgIndex === null) return;
+  // ====== 送信処理 ======
+  const form = document.getElementById('submitForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('nameInput').value;
+      const scoreVal = document.getElementById('scoreInput').value;
+      const canvasData = document.getElementById('drawCanvas').toDataURL();
 
-  const connected = getConnected(x, y, imgIndex);
-  if (connected.length >= 2) {
-    score += connected.length * connected.length;
-    removeAndCollapse(connected);
+      fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec', {
+        method: 'POST',
+        body: JSON.stringify({ name, score: scoreVal, image: canvasData }),
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert('登録完了！');
+        document.getElementById('scoreForm').style.display = 'none';
+        document.getElementById('rankingSection').style.display = 'block';
+        fetchRanking();
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('登録失敗...');
+      });
+    });
   }
-});
 
-window.onload = () => {
+  // ====== ランキング読み込み ======
+  function fetchRanking() {
+    fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec')
+      .then(response => response.json())
+      .then(data => {
+        const rankingList = document.getElementById('rankingList');
+        rankingList.innerHTML = '';
+
+        data.sort((a, b) => b.score - a.score);
+
+        data.forEach((entry, index) => {
+          const item = document.createElement('div');
+          item.className = 'ranking-item';
+          item.innerHTML = `
+            <p>🥇 ${index + 1} 位</p>
+            <p>👤 ${entry.name} - ${entry.score} 点</p>
+            <p>📅 ${entry.date}</p>
+            <img src="${entry.image}" alt="絵" width="100">
+          `;
+          rankingList.appendChild(item);
+        });
+      })
+      .catch(error => {
+        console.error('ランキング取得エラー:', error);
+        document.getElementById('rankingList').textContent = '読み込み失敗...';
+      });
+  }
+
+  // ====== ランキングボタン ======
+  const showRankingBtn = document.getElementById('showRankingBtn');
+  if (showRankingBtn) {
+    showRankingBtn.addEventListener('click', () => {
+      document.getElementById('rankingSection').style.display = 'block';
+      document.getElementById('scoreForm').style.display = 'none';
+      document.getElementById('gameOver').style.display = 'none';
+      fetchRanking();
+    });
+  }
+
+  // ====== 初期ロード ======
   Promise.all(images.map(img => new Promise(resolve => {
     if (img.complete) {
-      resolve(); // すでに読み込まれてたら即resolve
+      resolve();
     } else {
       img.onload = () => {
         console.log(`loaded: ${img.src}`);
@@ -136,144 +280,5 @@ window.onload = () => {
     initBoard();
     setupDrawing();
   });
-};
 
-// =================== 絵描き機能 ===================
-function setupDrawing() {
-  const drawCanvas = document.getElementById('drawCanvas');
-  if (!drawCanvas) return;
-  const drawCtx = drawCanvas.getContext('2d');
-  let drawing = false;
-  let currentColor = 'black';
-
-  window.changeColor = function(color) {
-    currentColor = color;
-  };
-
-  window.clearCanvas = function() {
-    drawCtx.clearRect(0, 0, drawCtx.canvas.width, drawCtx.canvas.height);
-  };
-
-  function getPointerPosition(e) {
-    let rect = drawCanvas.getBoundingClientRect();
-    if (e.touches) {
-      return {
-        x: e.touches[0].clientX - rect.left,
-        y: e.touches[0].clientY - rect.top
-      };
-    } else {
-      return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      };
-    }
-  }
-
-  drawCanvas.addEventListener('mousedown', (e) => {
-    drawing = true;
-    drawCtx.beginPath();
-    let pos = getPointerPosition(e);
-    drawCtx.moveTo(pos.x, pos.y);
-  });
-
-  drawCanvas.addEventListener('mouseup', () => {
-    drawing = false;
-  });
-
-  drawCanvas.addEventListener('mousemove', (e) => {
-    if (!drawing) return;
-    let pos = getPointerPosition(e);
-    drawCtx.lineWidth = 2;
-    drawCtx.lineCap = 'round';
-    drawCtx.strokeStyle = currentColor;
-    drawCtx.lineTo(pos.x, pos.y);
-    drawCtx.stroke();
-  });
-
-  drawCanvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    drawing = true;
-    drawCtx.beginPath();
-    let pos = getPointerPosition(e);
-    drawCtx.moveTo(pos.x, pos.y);
-  });
-
-  drawCanvas.addEventListener('touchend', () => {
-    drawing = false;
-  });
-
-  drawCanvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    if (!drawing) return;
-    let pos = getPointerPosition(e);
-    drawCtx.lineWidth = 2;
-    drawCtx.lineCap = 'round';
-    drawCtx.strokeStyle = currentColor;
-    drawCtx.lineTo(pos.x, pos.y);
-    drawCtx.stroke();
-  });
-}
-
-// =================== 送信処理 ===================
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('submitForm');
-  if (!form) return;
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const name = document.getElementById('nameInput').value;
-    const scoreVal = document.getElementById('scoreInput').value;
-    const canvasData = document.getElementById('drawCanvas').toDataURL();
-
-    fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec', {
-      method: 'POST',
-      body: JSON.stringify({ name, score: scoreVal, image: canvasData }),
-    })
-    .then(response => response.text())
-    .then(data => {
-      alert('登録完了！');
-      document.getElementById('scoreForm').style.display = 'none';
-      document.getElementById('rankingSection').style.display = 'block';
-      fetchRanking();
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-      alert('登録失敗...');
-    });
-  });
-});
-
-// =================== ランキング読み込み ===================
-function fetchRanking() {
-  fetch('https://script.google.com/macros/s/AKfycbwB3e3AVjkTqhx6geH4aI4AiXmrSznM_9sDGbMn3xevfUmHxeT3q8n4MQdcaSWJ3DgC/exec')
-    .then(response => response.json())
-    .then(data => {
-      const rankingList = document.getElementById('rankingList');
-      rankingList.innerHTML = ''; // 一旦クリア
-
-      data.sort((a, b) => b.score - a.score);  // 高得点順にソート
-
-      data.forEach((entry, index) => {
-        const item = document.createElement('div');
-        item.className = 'ranking-item';  // ⭐ CSSで使う
-
-        item.innerHTML = `
-          <p>🥇 ${index + 1} 位</p>
-          <p>👤 ${entry.name} - ${entry.score} 点</p>
-          <p>📅 ${entry.date}</p>
-          <img src="${entry.image}" alt="絵" width="100">
-        `;
-        rankingList.appendChild(item);
-      });
-    })
-    .catch(error => {
-      console.error('ランキング取得エラー:', error);
-      document.getElementById('rankingList').textContent = '読み込み失敗...';
-    });
-}
-
-document.getElementById('showRankingBtn').addEventListener('click', () => {
-  document.getElementById('rankingSection').style.display = 'block';
-  document.getElementById('scoreForm').style.display = 'none';
-  document.getElementById('gameOver').style.display = 'none';
-  fetchRanking();
 });
